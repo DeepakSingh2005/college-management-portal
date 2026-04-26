@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
      "build": "vite build",
-    "start": "node index.js",
+    "aaart": "node index.js",
     "seed": "node admin-seeder.js",
     "seed:demo": "node demo-seeder.js"
   },
