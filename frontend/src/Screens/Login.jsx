@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiLogIn, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
-import axios from "axios";
+import { FiLogIn, FiMail, FiLock, FiEye, FiEyeOff, FiMoon, FiSun } from "react-icons/fi";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { setUserToken } from "../redux/actions";
@@ -105,15 +104,15 @@ const LoginForm = ({ selected, onSubmit, formData, setFormData, isLoading }) => 
 };
 
 const UserTypeSelector = ({ selected, onSelect }) => (
-  <div className="flex justify-center gap-4 mb-8">
+  <div className="flex justify-center gap-4 mb-8 auth-user-type-selector">
     {Object.values(USER_TYPES).map((type) => (
       <button
         key={type}
         onClick={() => onSelect(type)}
-        className={`px-6 py-3 text-sm font-semibold rounded-full transition-all duration-300 transform hover:scale-105 ${
+        className={`px-6 py-3 text-sm font-semibold rounded-full transition-all duration-300 transform hover:scale-105 auth-user-type-button ${
           selected === type
-            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105"
-            : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 hover:shadow-md border border-gray-200"
+            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105 auth-user-type-button-active"
+            : "bg-white/60 backdrop-blur-sm text-gray-700 hover:bg-white/80 hover:shadow-md border border-gray-200 auth-user-type-button-idle"
         }`}
       >
         {type}
@@ -122,7 +121,7 @@ const UserTypeSelector = ({ selected, onSelect }) => (
   </div>
 );
 
-const Login = () => {
+const Login = ({ theme = "light", onToggleTheme }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -203,7 +202,18 @@ const Login = () => {
   }, [type]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center px-4 py-12 relative overflow-hidden dark-auth-shell">
+      <button
+        type="button"
+        onClick={onToggleTheme}
+        className="absolute top-6 right-6 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur-md text-gray-700 border border-white/40 shadow-lg hover:bg-white auth-theme-toggle"
+        title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      >
+        {theme === "dark" ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+        <span className="text-sm font-medium">
+          {theme === "dark" ? "Light" : "Dark"}
+        </span>
+      </button>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
@@ -259,8 +269,8 @@ const Login = () => {
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#fff',
-            color: '#333',
+            background: theme === "dark" ? "#0f172a" : "#fff",
+            color: theme === "dark" ? "#e2e8f0" : "#333",
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           },

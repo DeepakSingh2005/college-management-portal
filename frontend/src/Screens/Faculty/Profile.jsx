@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import CustomButton from "../../components/CustomButton";
 import UpdatePasswordLoggedIn from "../../components/UpdatePasswordLoggedIn";
+import axiosWrapper from "../../utils/AxiosWrapper";
+import { toast } from "react-hot-toast";
 
-const Profile = ({ profileData }) => {
+const Profile = ({ profileData, onProfileUpdate, onRefreshProfile }) => {
   const [showPasswordUpdate, setShowPasswordUpdate] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
   if (!profileData) return null;
+
+  const profileImageSrc = profileData.profile
+    ? `${process.env.REACT_APP_MEDIA_LINK}/${profileData.profile}`
+    : "https://placehold.co/160x160?text=Profile";
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -14,16 +22,68 @@ const Profile = ({ profileData }) => {
     });
   };
 
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a JPG, PNG, or WEBP image");
+      event.target.value = "";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsUploading(true);
+    try {
+      const response = await axiosWrapper.patch("/faculty/my-details", formData);
+      if (response.data.success) {
+        onProfileUpdate?.(response.data.data);
+        toast.success("Profile picture updated");
+        await onRefreshProfile?.();
+      } else {
+        toast.error(response.data.message || "Failed to update profile picture");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message || "Failed to update profile picture"
+      );
+    } finally {
+      setIsUploading(false);
+      event.target.value = "";
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8">
       {/* Header Section */}
-      <div className="flex items-center gap-8 mb-12 border-b pb-8 justify-between">
-        <div className="flex items-center gap-8">
-          <img
-            src={`${process.env.REACT_APP_MEDIA_LINK}/${profileData.profile}`}
-            alt="Profile"
-            className="w-40 h-40 rounded-full object-cover ring-4 ring-blue-500 ring-offset-4"
-          />
+      <div className="flex flex-col gap-8 mb-12 border-b pb-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-center gap-4">
+            <img
+              src={profileImageSrc}
+              alt="Profile"
+              className="w-40 h-40 rounded-full object-cover ring-4 ring-blue-500 ring-offset-4"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleProfileImageChange}
+            />
+            <CustomButton
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              variant="secondary"
+              className="w-full sm:w-auto"
+            >
+              {isUploading ? "Uploading..." : "Change Photo"}
+            </CustomButton>
+          </div>
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
               {`${profileData.firstName} ${profileData.lastName}`}

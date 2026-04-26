@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import MenuTabs from "../../components/MenuTabs";
 import { toast, Toaster } from "react-hot-toast";
 import Notice from "../Notice";
 import Student from "./Student";
@@ -26,19 +26,19 @@ const MENU_ITEMS = [
   { id: "admin", label: "Admin", component: Admin },
 ];
 
-const Home = () => {
+const Home = ({ theme, onToggleTheme }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [profileData, setProfileData] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const userToken = localStorage.getItem("userToken");
 
   const fetchUserDetails = useCallback(async () => {
     if (!userToken) return;
-    
+
     setIsLoading(true);
     try {
       toast.loading("Loading user details...");
@@ -71,7 +71,7 @@ const Home = () => {
   }, [dispatch, fetchUserDetails]);
 
   const toggleSidebar = useCallback(() => {
-    setSidebarOpen(prev => !prev);
+    setSidebarOpen((prev) => !prev);
   }, []);
 
   useEffect(() => {
@@ -85,23 +85,23 @@ const Home = () => {
     setSelectedMenu(validMenu ? validMenu.id : "home");
   }, [location.pathname, location.search]);
 
-
   const renderContent = () => {
     if (isLoading) {
       return (
         <div className="flex flex-col justify-center items-center h-64">
           <div className="relative">
             <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-600 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            <div
+              className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-600 rounded-full animate-spin"
+              style={{ animationDirection: "reverse", animationDuration: "1.5s" }}
+            ></div>
           </div>
           <p className="mt-4 text-gray-600 font-medium">Loading...</p>
         </div>
       );
     }
 
-    const MenuItem = MENU_ITEMS.find(
-      (item) => item.id === selectedMenu
-    )?.component;
+    const MenuItem = MENU_ITEMS.find((item) => item.id === selectedMenu)?.component;
 
     if (selectedMenu === "home" && profileData) {
       return <Profile profileData={profileData} onUpdate={handleProfileUpdate} />;
@@ -110,52 +110,46 @@ const Home = () => {
     return MenuItem && <MenuItem />;
   };
 
-  const handleMenuClick = useCallback((menuId) => {
-    setSelectedMenu(menuId);
-    navigate(`/admin?page=${menuId}`);
-  }, [navigate]);
+  const handleMenuClick = useCallback(
+    (menuId) => {
+      setSelectedMenu(menuId);
+      navigate(`/admin?page=${menuId}`);
+    },
+    [navigate]
+  );
 
   const menuItemsMemo = useMemo(() => MENU_ITEMS, []);
 
   return (
     <>
-      <Navbar 
+      <Navbar
         onToggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
-      <div className="flex h-[calc(100vh-80px)] relative">
-        {/* Sidebar */}
-        <Sidebar
-          isOpen={sidebarOpen}
-          onToggle={toggleSidebar}
-          menuItems={menuItemsMemo}
-          selectedMenu={selectedMenu}
-          onMenuClick={handleMenuClick}
-        />
+      <div className="min-h-[calc(100vh-80px)] bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <MenuTabs
+            menuItems={menuItemsMemo}
+            selectedMenu={selectedMenu}
+            onMenuClick={handleMenuClick}
+          />
+        </div>
 
-        {/* Main Content */}
-        <div 
-          className={`flex-1 overflow-y-auto bg-gray-50 transition-all duration-300 ease-in-out ${
-            sidebarOpen ? 'ml-64' : 'ml-0'
-          }`}
-        >
-          {/* Content */}
-          <div className="p-4 sm:p-6 lg:p-8">
-            <div className="animate-fade-in">
-              {renderContent()}
-            </div>
-          </div>
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+          <div className="animate-fade-in">{renderContent()}</div>
         </div>
       </div>
-      <Toaster 
-        position="top-right" 
+      <Toaster
+        position="top-right"
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#fff',
-            color: '#333',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            background: "#fff",
+            color: "#333",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
           },
         }}
       />

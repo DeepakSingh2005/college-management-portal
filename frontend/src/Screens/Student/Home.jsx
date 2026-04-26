@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Navbar from "../../components/Navbar";
+import MenuTabs from "../../components/MenuTabs";
 import { toast, Toaster } from "react-hot-toast";
 import Notice from "../Notice";
 import { useDispatch } from "react-redux";
@@ -21,14 +22,19 @@ const MENU_ITEMS = [
   { id: "marks", label: "Marks", component: ViewMarks },
 ];
 
-const Home = () => {
+const Home = ({ theme, onToggleTheme }) => {
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [profileData, setProfileData] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const userToken = localStorage.getItem("userToken");
   const location = useLocation();
   const navigate = useNavigate();
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => !prev);
+  }, []);
 
   const fetchUserDetails = useCallback(async () => {
     if (!userToken) return;
@@ -58,20 +64,6 @@ const Home = () => {
     fetchUserDetails();
   }, [fetchUserDetails]);
 
-  const getMenuItemClass = (menuId) => {
-    const isSelected = selectedMenu.toLowerCase() === menuId.toLowerCase();
-    return `
-      text-center px-6 py-3 cursor-pointer
-      font-medium text-sm w-full
-      rounded-md
-      transition-all duration-300 ease-in-out
-      ${
-        isSelected
-          ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg transform -translate-y-1"
-          : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-      }
-    `;
-  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -81,7 +73,13 @@ const Home = () => {
     }
 
     if (selectedMenu === "home" && profileData) {
-      return <Profile profileData={profileData} />;
+      return (
+        <Profile
+          profileData={profileData}
+          onProfileUpdate={setProfileData}
+          onRefreshProfile={fetchUserDetails}
+        />
+      );
     }
 
     const MenuItem = MENU_ITEMS.find(
@@ -105,19 +103,18 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        onToggleSidebar={toggleSidebar}
+        sidebarOpen={sidebarOpen}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
       <div className="max-w-7xl mx-auto">
-        <ul className="flex justify-evenly items-center gap-10 w-full mx-auto my-8">
-          {MENU_ITEMS.map((item) => (
-            <li
-              key={item.id}
-              className={getMenuItemClass(item.id)}
-              onClick={() => handleMenuClick(item.id)}
-            >
-              {item.label}
-            </li>
-          ))}
-        </ul>
+        <MenuTabs
+          menuItems={MENU_ITEMS}
+          selectedMenu={selectedMenu}
+          onMenuClick={handleMenuClick}
+        />
 
         {renderContent()}
       </div>

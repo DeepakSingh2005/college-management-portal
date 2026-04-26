@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Navbar from "../../components/Navbar";
+import MenuTabs from "../../components/MenuTabs";
 import { toast, Toaster } from "react-hot-toast";
 import Notice from "../Notice";
 import { useDispatch } from "react-redux";
@@ -11,6 +12,7 @@ import StudentFinder from "./StudentFinder";
 import Profile from "./Profile";
 import Marks from "./AddMarks";
 import Exam from "../Exam";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const MENU_ITEMS = [
   { id: "home", label: "Home", component: null },
@@ -22,49 +24,70 @@ const MENU_ITEMS = [
   { id: "exam", label: "Exam", component: Exam },
 ];
 
-const Home = () => {
-  const [selectedMenu, setSelectedMenu] = useState("Home");
+const Home = ({ theme, onToggleTheme }) => {
+  const [selectedMenu, setSelectedMenu] = useState("home");
   const [profileData, setProfileData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const userToken = localStorage.getItem("userToken");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => !prev);
+  }, []);
+
+  const fetchUserDetails = useCallback(async () => {
     if (!userToken) return;
-    
-    const fetchUserDetails = async () => {
-      try {
-        const response = await axiosWrapper.get("/faculty/my-details");
 
-        if (response.data.success) {
-          setProfileData(response.data.data);
-          dispatch(setUserData(response.data.data));
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error(error.response?.data?.message || "Failed to load profile");
+    setIsLoading(true);
+    try {
+      const response = await axiosWrapper.get("/faculty/my-details");
+
+      if (response.data.success) {
+        setProfileData(response.data.data);
+        dispatch(setUserData(response.data.data));
+      } else {
+        toast.error(response.data.message);
       }
-    };
-
-    fetchUserDetails();
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Failed to load profile");
+    } finally {
+      setIsLoading(false);
+    }
   }, [dispatch, userToken]);
 
-  const getMenuItemClass = (menuId) => {
-    const isSelected = selectedMenu.toLowerCase() === menuId.toLowerCase();
-    return `text-center px-6 py-3 cursor-pointer font-medium text-sm w-full rounded-md ${
-      isSelected
-        ? "bg-blue-500 text-white"
-        : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-    }`;
-  };
+  useEffect(() => {
+    fetchUserDetails();
+  }, [fetchUserDetails]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const pathMenuId = urlParams.get("page") || "home";
+    const validMenu = MENU_ITEMS.find((item) => item.id === pathMenuId);
+    setSelectedMenu(validMenu ? validMenu.id : "home");
+  }, [location.pathname, location.search]);
 
   const renderContent = () => {
-    if (selectedMenu === "Home" && profileData) {
-      return <Profile profileData={profileData} />;
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center h-64">Loading...</div>
+      );
     }
 
-    const menuItem = MENU_ITEMS.find(
-      (item) => item.label.toLowerCase() === selectedMenu.toLowerCase()
-    );
+    if (selectedMenu === "home" && profileData) {
+      return (
+        <Profile
+          profileData={profileData}
+          onProfileUpdate={setProfileData}
+          onRefreshProfile={fetchUserDetails}
+        />
+      );
+    }
+
+    const menuItem = MENU_ITEMS.find((item) => item.id === selectedMenu);
 
     if (menuItem && menuItem.component) {
       const Component = menuItem.component;
@@ -76,19 +99,21 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        onToggleSidebar={toggleSidebar}
+        sidebarOpen={sidebarOpen}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
+      />
       <div className="max-w-7xl mx-auto">
-        <ul className="flex justify-evenly items-center gap-10 w-full mx-auto my-8">
-          {MENU_ITEMS.map((item) => (
-            <li
-              key={item.id}
-              className={getMenuItemClass(item.id)}
-              onClick={() => setSelectedMenu(item.label)}
-            >
-              {item.label}
-            </li>
-          ))}
-        </ul>
+        <MenuTabs
+          menuItems={MENU_ITEMS}
+          selectedMenu={selectedMenu}
+          onMenuClick={(id) => {
+            setSelectedMenu(id);
+            navigate(`/faculty?page=${id}`);
+          }}
+        />
 
         {renderContent()}
       </div>

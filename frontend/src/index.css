@@ -23,6 +23,179 @@
   }
 }
 
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  background: #09111f;
+  color: #e5eefb;
+}
+
+html[data-theme="dark"] body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+}
+
+html[data-theme="dark"] .bg-gray-50 {
+  @apply bg-slate-950 !important;
+}
+
+html[data-theme="dark"] .bg-gray-100,
+html[data-theme="dark"] .bg-blue-50 {
+  @apply bg-slate-800 !important;
+}
+
+html[data-theme="dark"] .bg-green-50,
+html[data-theme="dark"] .bg-purple-50,
+html[data-theme="dark"] .bg-emerald-50,
+html[data-theme="dark"] .bg-green-100,
+html[data-theme="dark"] .bg-red-100 {
+  @apply bg-slate-800 !important;
+}
+
+html[data-theme="dark"] .from-blue-50,
+html[data-theme="dark"] .from-green-50,
+html[data-theme="dark"] .from-blue-100,
+html[data-theme="dark"] .from-green-100 {
+  --tw-gradient-from: rgb(15 23 42 / 1) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(15 23 42 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+html[data-theme="dark"] .to-purple-50,
+html[data-theme="dark"] .to-emerald-50,
+html[data-theme="dark"] .to-purple-100,
+html[data-theme="dark"] .to-emerald-100 {
+  --tw-gradient-to: rgb(30 41 59 / 1) var(--tw-gradient-to-position) !important;
+}
+
+html[data-theme="dark"] .bg-gray-200 {
+  @apply bg-slate-700 !important;
+}
+
+html[data-theme="dark"] .text-gray-900 {
+  @apply text-slate-100 !important;
+}
+
+html[data-theme="dark"] .text-gray-700,
+html[data-theme="dark"] .text-gray-600,
+html[data-theme="dark"] .text-gray-500 {
+  @apply text-slate-300 !important;
+}
+
+html[data-theme="dark"] .text-blue-700,
+html[data-theme="dark"] .text-green-700,
+html[data-theme="dark"] .text-purple-700 {
+  @apply text-sky-300 !important;
+}
+
+html[data-theme="dark"] .text-blue-900,
+html[data-theme="dark"] .text-green-900,
+html[data-theme="dark"] .text-green-800,
+html[data-theme="dark"] .text-red-800 {
+  @apply text-slate-100 !important;
+}
+
+html[data-theme="dark"] .border-gray-200 {
+  @apply border-slate-700 !important;
+}
+
+html[data-theme="dark"] .border-blue-200 {
+  @apply border-slate-700 !important;
+}
+
+html[data-theme="dark"] .border-green-200,
+html[data-theme="dark"] .border-white {
+  @apply border-slate-700 !important;
+}
+
+html[data-theme="dark"] .shadow-md,
+html[data-theme="dark"] .shadow-lg,
+html[data-theme="dark"] .shadow-xl,
+html[data-theme="dark"] .shadow-2xl {
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.45) !important;
+}
+
+html[data-theme="dark"] .hover\:bg-gray-100:hover,
+html[data-theme="dark"] .hover\:bg-gray-200:hover,
+html[data-theme="dark"] .hover\:bg-blue-50:hover,
+html[data-theme="dark"] .hover\:bg-blue-100:hover {
+  @apply bg-slate-700 !important;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] select:disabled,
+html[data-theme="dark"] textarea:disabled {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .dark-auth-shell {
+  background: radial-gradient(circle at top, rgba(37, 99, 235, 0.22), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.18), transparent 30%),
+    linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+}
+
+html[data-theme="dark"] .auth-theme-toggle {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .auth-theme-toggle:hover {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+}
+
+html[data-theme="dark"] .auth-user-type-button-idle {
+  background: rgba(15, 23, 42, 0.82) !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.28) !important;
+}
+
+html[data-theme="dark"] .auth-user-type-button-idle:hover {
+  background: rgba(30, 41, 59, 0.96) !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .auth-user-type-button-active {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+  color: #eff6ff !important;
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.35) !important;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

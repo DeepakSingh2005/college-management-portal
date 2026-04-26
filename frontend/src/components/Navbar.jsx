@@ -1,11 +1,10 @@
 import React from "react";
-import { FiLogOut, FiUser, FiMenu } from "react-icons/fi";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FiLogOut, FiMoon, FiSun, FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import CustomButton from "./CustomButton";
 
-const Navbar = ({ onToggleSidebar, sidebarOpen }) => {
-  const router = useLocation();
+const Navbar = ({ onToggleSidebar, sidebarOpen, theme = "light", onToggleTheme }) => {
   const navigate = useNavigate();
   const userType = localStorage.getItem("userType") || "User";
 
@@ -15,18 +14,12 @@ const Navbar = ({ onToggleSidebar, sidebarOpen }) => {
     navigate("/");
   };
 
-  const handleToggleSidebar = () => {
+  const handleDashboardClick = () => {
+    // Toggle sidebar when available (Admin page has sidebar)
     if (onToggleSidebar) {
       onToggleSidebar();
-    } else {
-      console.warn("onToggleSidebar function not provided");
     }
-  };
-
-  const handleDashboardClick = () => {
-    // Toggle sidebar when available (gives immediate visual feedback)
-    if (onToggleSidebar) onToggleSidebar();
-    // Navigate to the user's dashboard route
+    // Always navigate to user's dashboard
     navigate(`/${userType.toLowerCase()}`);
   };
 
@@ -35,18 +28,11 @@ const Navbar = ({ onToggleSidebar, sidebarOpen }) => {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            {/* Dashboard Toggle Button */}
-            <button
-              onClick={handleToggleSidebar}
-              className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-              title={sidebarOpen ? "Hide Dashboard" : "Show Dashboard"}
-            >
-              <FiMenu className="text-xl" />
-            </button>
-            
+            {/* Main Dashboard Button - Works across all sections */}
             <div 
               className="flex items-center gap-3 cursor-pointer group"
               onClick={handleDashboardClick}
+              title="Go to Dashboard"
             >
               <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
                 <RxDashboard className="text-white text-2xl" />
@@ -62,9 +48,28 @@ const Navbar = ({ onToggleSidebar, sidebarOpen }) => {
           
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate(`/${userType.toLowerCase()}`)}
+              onClick={onToggleTheme}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all duration-200 hover:shadow-md"
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+              type="button"
+            >
+              {theme === "dark" ? (
+                <>
+                  <FiSun className="text-lg" />
+                  <span className="text-sm font-medium">Light</span>
+                </>
+              ) : (
+                <>
+                  <FiMoon className="text-lg" />
+                  <span className="text-sm font-medium">Dark</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => navigate(`/${userType.toLowerCase()}?page=home`)}
               className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all duration-200 hover:shadow-md"
               title="Profile"
+              type="button"
             >
               <FiUser className="text-xl" />
             </button>

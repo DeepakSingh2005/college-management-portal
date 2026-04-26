@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import axiosWrapper from "../utils/AxiosWrapper";
 import CustomButton from "../components/CustomButton";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 const USER_TYPES = {
   STUDENT: "Student",
@@ -28,7 +29,7 @@ const UserTypeSelector = ({ selected, onSelect }) => (
   </div>
 );
 
-const ForgetPassword = () => {
+const ForgetPassword = ({ theme = "light", onToggleTheme }) => {
   const navigate = useNavigate();
   const userToken = localStorage.getItem("userToken");
   const [selected, setSelected] = useState(USER_TYPES.STUDENT);
@@ -77,7 +78,18 @@ const ForgetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-gray-100 via-white to-gray-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-tr from-gray-100 via-white to-gray-100 flex items-center justify-center px-4 relative dark-auth-shell">
+      <button
+        type="button"
+        onClick={onToggleTheme}
+        className="absolute top-6 right-6 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 backdrop-blur-md text-gray-700 border border-white/40 shadow-lg hover:bg-white auth-theme-toggle"
+        title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+      >
+        {theme === "dark" ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+        <span className="text-sm font-medium">
+          {theme === "dark" ? "Light" : "Dark"}
+        </span>
+      </button>
       <div className="w-full max-w-[40%] px-6 py-12">
         <h1 className="text-4xl font-bold text-gray-800 text-center mb-6">
           {selected} Forget Password
@@ -111,7 +123,15 @@ const ForgetPassword = () => {
           </CustomButton>
         </form>
       </div>
-      <Toaster position="bottom-center" />
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: theme === "dark" ? "#0f172a" : "#fff",
+            color: theme === "dark" ? "#e2e8f0" : "#333",
+          },
+        }}
+      />
     </div>
   );
 };

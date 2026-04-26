@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { FiEdit2, FiSave, FiX } from "react-icons/fi";
 import UpdatePasswordLoggedIn from "../../components/UpdatePasswordLoggedIn";
 import CustomButton from "../../components/CustomButton";
@@ -10,6 +10,8 @@ const Profile = React.memo(({ profileData, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleEdit = useCallback(() => {
     setEditedData({
@@ -120,6 +122,46 @@ const Profile = React.memo(({ profileData, onUpdate }) => {
     }
   }, []);
 
+  const handleProfileImageChange = useCallback(
+    async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Please upload a JPG, PNG, or WEBP image");
+        event.target.value = "";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      setIsUploading(true);
+      try {
+        const response = await axiosWrapper.patch("/admin/my-details", formData);
+
+        if (response.data?.success) {
+          toast.success("Profile picture updated");
+          onUpdate?.(response.data.data);
+        } else {
+          toast.error(
+            response.data?.message || "Failed to update profile picture"
+          );
+        }
+      } catch (error) {
+        console.error("Profile image update error:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to update profile picture"
+        );
+      } finally {
+        setIsUploading(false);
+        event.target.value = "";
+      }
+    },
+    [onUpdate]
+  );
+
   if (!profileData) {
     return null;
   }
@@ -132,18 +174,37 @@ const Profile = React.memo(({ profileData, onUpdate }) => {
     });
   };
 
+  const profileImageSrc = profileData.profile
+    ? `${process.env.REACT_APP_MEDIA_LINK}/${profileData.profile}`
+    : "https://placehold.co/160x160?text=Profile";
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mb-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg border border-blue-100">
         <div className="flex items-center gap-8">
-          <div className="relative">
+          <div className="relative flex flex-col items-center gap-4">
             <img
-              src={`${process.env.REACT_APP_MEDIA_LINK}/${profileData.profile}`}
+              src={profileImageSrc}
               alt="Profile"
               className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover ring-4 ring-blue-500 ring-offset-4 shadow-xl transform hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-white shadow-lg"></div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleProfileImageChange}
+            />
+            <CustomButton
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              variant="secondary"
+              className="w-full sm:w-auto"
+            >
+              {isUploading ? "Uploading..." : "Change Photo"}
+            </CustomButton>
           </div>
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">

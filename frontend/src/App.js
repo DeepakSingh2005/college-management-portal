@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Login from "./Screens/Login";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -10,20 +10,55 @@ import ForgetPassword from "./Screens/ForgetPassword";
 import UpdatePassword from "./Screens/UpdatePassword";
 
 const App = () => {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) =>
+      currentTheme === "dark" ? "light" : "dark"
+    );
+  };
+
   return (
     <>
       <Provider store={mystore}>
         <Router>
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/forget-password" element={<ForgetPassword />} />
+            <Route
+              path="/"
+              element={<Login theme={theme} onToggleTheme={toggleTheme} />}
+            />
+            <Route
+              path="/forget-password"
+              element={
+                <ForgetPassword theme={theme} onToggleTheme={toggleTheme} />
+              }
+            />
             <Route
               path="/:type/update-password/:resetId"
-              element={<UpdatePassword />}
+              element={
+                <UpdatePassword theme={theme} onToggleTheme={toggleTheme} />
+              }
             />
-            <Route path="/student" element={<StudentHome />} />
-            <Route path="/faculty" element={<FacultyHome />} />
-            <Route path="/admin" element={<AdminHome />} />
+            <Route
+              path="/student"
+              element={<StudentHome theme={theme} onToggleTheme={toggleTheme} />}
+            />
+            <Route
+              path="/faculty"
+              element={<FacultyHome theme={theme} onToggleTheme={toggleTheme} />}
+            />
+            <Route
+              path="/admin"
+              element={<AdminHome theme={theme} onToggleTheme={toggleTheme} />}
+            />
           </Routes>
         </Router>
       </Provider>
